@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="bn" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hair Matrix Studio - Men's Parlour & Hair Styling</title>
+    <title>Hair Matrix Studio - Men's Grooming Lounge</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -137,22 +137,24 @@
         }
     </style>
 </head>
-<body class="bg-dark-900 text-gray-100 antialiased selection:bg-amber-500 selection:text-black">
+<body class="bg-dark-900 text-gray-100 antialiased selection:bg-amber-500 selection:text-black pb-16 lg:pb-0">
 
     <!-- Header / Navbar -->
     <header class="sticky top-0 z-50 glass-card bg-dark-900/90 border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#home" class="flex items-center space-x-3">
-                <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 text-2xl font-bold">
-                    <i class="fa-solid font-scissors text-amber-400"></i>
+            <!-- Brand Logo -->
+            <a href="#home" class="flex items-center space-x-3 shrink-0">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 text-xl sm:text-2xl font-bold">
+                    <i class="fa-solid fa-scissors text-amber-400"></i>
                 </div>
                 <div>
-                    <span class="text-xl font-bold tracking-wider text-white block leading-none">HAIR MATRIX <span class="text-amber-500">STUDIO</span></span>
-                    <span class="text-xs text-amber-400/80 tracking-widest uppercase font-medium">Men's Grooming Lounge</span>
+                    <span class="text-base sm:text-xl font-bold tracking-wider text-white block leading-none">HAIR MATRIX <span class="text-amber-500">STUDIO</span></span>
+                    <span class="text-[10px] sm:text-xs text-amber-400/80 tracking-widest uppercase font-medium">Men's Grooming Lounge</span>
                 </div>
             </a>
 
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+            <!-- Desktop Navigation Links (lg breakpoint and above) -->
+            <nav class="hidden lg:flex items-center space-x-8 text-sm font-medium">
                 <a href="#home" class="text-amber-400 hover:text-amber-300 transition" data-bn="হোম" data-en="Home">হোম</a>
                 <a href="#about" class="hover:text-amber-400 transition" data-bn="আমাদের সম্পর্কে" data-en="About Us">আমাদের সম্পর্কে</a>
                 <a href="#services" class="hover:text-amber-400 transition" data-bn="সার্ভিসসমূহ" data-en="Services">সার্ভিসসমূহ</a>
@@ -161,26 +163,50 @@
                 <a href="#contact" class="hover:text-amber-400 transition" data-bn="যোগাযোগ" data-en="Contact">যোগাযোগ</a>
             </nav>
 
-            <div class="flex items-center space-x-4">
+            <!-- Right Controls: Language Toggle, Book CTA, Mobile Hamburger Button -->
+            <div class="flex items-center space-x-2 sm:space-x-4">
                 <!-- Language Toggle Button -->
-                <button id="langToggleBtn" onclick="toggleLanguage()" class="px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-xs font-semibold text-amber-400 hover:border-amber-500 transition flex items-center gap-1.5">
+                <button id="langToggleBtn" onclick="toggleLanguage()" class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-xs font-semibold text-amber-400 hover:border-amber-500 transition flex items-center gap-1">
                     <i class="fa-solid fa-globe"></i>
                     <span id="currentLangText">BN</span>
                 </button>
 
-                <button onclick="openBookingModal()" class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-semibold text-sm text-black gold-bg-gradient hover:opacity-90 shadow-lg shadow-amber-500/20 transition">
+                <!-- Desktop / Tablet Booking CTA Button -->
+                <button onclick="openBookingModal()" class="hidden md:inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-black gold-bg-gradient hover:opacity-90 shadow-lg shadow-amber-500/20 transition">
                     <i class="fa-solid fa-calendar-check mr-2"></i>
                     <span data-bn="বুকিং করুন" data-en="Book Appointment">বুকিং করুন</span>
+                </button>
+
+                <!-- Hamburger Menu Button (visible on mobile and tablet: < lg) -->
+                <button id="hamburgerBtn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-gray-300 hover:text-amber-400 hover:bg-gray-800 focus:outline-none transition" aria-label="Toggle Navigation Menu">
+                    <i id="hamburgerIcon" class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile & Tablet Drawer Menu Dropdown -->
+        <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-800 bg-dark-900/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-2 shadow-2xl transition-all">
+            <a href="#home" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/20" data-bn="হোম" data-en="Home">হোম</a>
+            <a href="#about" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="আমাদের সম্পর্কে" data-en="About Us">আমাদের সম্পর্কে</a>
+            <a href="#services" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="সার্ভিসসমূহ" data-en="Services">সার্ভিসসমূহ</a>
+            <a href="#gallery" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="গ্যালারি" data-en="Gallery">গ্যালারি</a>
+            <a href="#calculator" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="ক্যালকুলেটর" data-en="Calculator">ক্যালকুলেটর</a>
+            <a href="#contact" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="যোগাযোগ" data-en="Contact">যোগাযোগ</a>
+            
+            <div class="pt-2">
+                <button onclick="closeMobileMenu(); openBookingModal();" class="w-full py-3 rounded-xl font-bold text-black gold-bg-gradient hover:opacity-90 shadow-lg shadow-amber-500/20 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span data-bn="অ্যাপয়েন্টমেন্ট বুক করুন" data-en="Book Appointment">অ্যাপয়েন্টমেন্ট বুক করুন</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="relative py-16 lg:py-24 overflow-hidden">
+    <section id="home" class="relative py-12 sm:py-16 lg:py-24 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-medium mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-medium mb-6">
                     <i class="fa-solid fa-crown text-amber-400"></i>
                     <span data-bn="মিরপুর ১১.৫ এর এক নম্বর পুরুষদের স্টাইলিং হাব" data-en="Mirpur 11.5's #1 Men's Styling Lounge">মিরপুর ১১.৫ এর এক নম্বর পুরুষদের স্টাইলিং হাব</span>
                 </div>
@@ -188,7 +214,7 @@
                     <span data-bn="নতুন লুকে নিজেকে আবিষ্কার করুন" data-en="Discover Your New Look">নতুন লুকে নিজেকে আবিষ্কার করুন</span> <br>
                     <span class="gold-gradient-text">— Hair Matrix Studio</span>
                 </h1>
-                <p class="text-gray-400 text-base sm:text-lg mb-8 leading-relaxed" data-bn="আমাদের অভিজ্ঞ স্টাইলিস্টদের হাতে আপনার চুল, দাড়ি ও স্কিনের সঠিক যত্ন নিন। প্রিমিয়াম পরিবেশ ও প্রফেশনাল সার্ভিসের নিশ্চয়তা।" data-en="Get expert hair, beard, and skincare treatment from our professional stylists. Guaranteed premium ambience and services.">
+                <p class="text-gray-400 text-sm sm:text-base lg:text-lg mb-8 leading-relaxed" data-bn="আমাদের অভিজ্ঞ স্টাইলিস্টদের হাতে আপনার চুল, দাড়ি ও স্কিনের সঠিক যত্ন নিন। প্রিমিয়াম পরিবেশ ও প্রফেশনাল সার্ভিসের নিশ্চয়তা।" data-en="Get expert hair, beard, and skincare treatment from our professional stylists. Guaranteed premium ambience and services.">
                     আমাদের অভিজ্ঞ স্টাইলিস্টদের হাতে আপনার চুল, দাড়ি ও স্কিনের সঠিক যত্ন নিন। প্রিমিয়াম পরিবেশ ও প্রফেশনাল সার্ভিসের নিশ্চয়তা।
                 </p>
 
@@ -261,7 +287,7 @@
         </div>
     </section>
 
-    <!-- Gallery Section with Carousel -->
+    <!-- Gallery Section with Carousel Grid -->
     <section id="gallery" class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
@@ -269,9 +295,9 @@
                 <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1" data-bn="আমাদের সাম্প্রতিক সেরা ৬টি স্টাইলিং কাজ" data-en="Our Recent Top 6 Styling Works">আমাদের সাম্প্রতিক সেরা ৬টি স্টাইলিং কাজ</h2>
             </div>
 
-            <!-- Carousel Grid Container -->
+            <!-- Carousel Grid Container (1 col on mobile, 2 on tablet, 3 on desktop) -->
             <div class="relative max-w-5xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="galleryGrid">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="galleryGrid">
                     <!-- Slide 1 -->
                     <div class="glass-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1517832606589-715006d31326?auto=format&fit=crop&q=80&w=800', 'Fade Cut & Beard Contour')">
                         <div class="relative aspect-[4/5] overflow-hidden">
@@ -460,7 +486,7 @@
     <!-- Calculator Section -->
     <section id="calculator" class="py-16">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="glass-card p-8 rounded-3xl border border-amber-500/30 relative overflow-hidden">
+            <div class="glass-card p-6 sm:p-8 rounded-3xl border border-amber-500/30 relative overflow-hidden">
                 <div class="text-center mb-8">
                     <span class="text-amber-400 font-semibold text-xs uppercase tracking-widest" data-bn="বাজেট হিসাব" data-en="Budget Estimator">বাজেট হিসাব</span>
                     <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1" data-bn="সার্ভিস মূল্য ক্যালকুলেটর" data-en="Service Cost Calculator">সার্ভিস মূল্য ক্যালকুলেটর</h2>
@@ -609,7 +635,7 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-4 mt-8">
+                    <div class="flex flex-wrap gap-4 mt-8">
                         <a href="https://wa.me/8801755839901" target="_blank" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center gap-2 transition shadow-lg shadow-emerald-600/20">
                             <i class="fa-brands fa-whatsapp text-lg"></i>
                             <span data-bn="হোয়াটসঅ্যাপ চ্যাট" data-en="WhatsApp Chat">হোয়াটসঅ্যাপ চ্যাট</span>
@@ -761,23 +787,49 @@
         </div>
     </div>
 
-    <!-- Mobile Sticky Quick Bar -->
-    <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-900/95 border-t border-gray-800 p-3 backdrop-blur-md flex items-center justify-around">
+    <!-- Mobile Sticky Quick Bar (Visible only on mobile devices < sm) -->
+    <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-900/95 border-t border-gray-800 p-2.5 backdrop-blur-md flex items-center justify-around">
         <a href="tel:+8801755839901" class="flex flex-col items-center text-amber-400 text-xs font-medium">
-            <i class="fa-solid fa-phone text-lg mb-0.5"></i>
+            <i class="fa-solid fa-phone text-base mb-0.5"></i>
             <span data-bn="কল করুন" data-en="Call">কল করুন</span>
         </a>
-        <button onclick="openBookingModal()" class="px-5 py-2.5 rounded-xl text-black font-bold text-xs gold-bg-gradient shadow-lg shadow-amber-500/20">
+        <button onclick="openBookingModal()" class="px-5 py-2 rounded-xl text-black font-bold text-xs gold-bg-gradient shadow-lg shadow-amber-500/20">
             <span data-bn="বুকিং করুন" data-en="Book Now">বুকিং করুন</span>
         </button>
         <a href="https://wa.me/8801755839901" target="_blank" class="flex flex-col items-center text-emerald-400 text-xs font-medium">
-            <i class="fa-brands fa-whatsapp text-xl mb-0.5"></i>
+            <i class="fa-brands fa-whatsapp text-lg mb-0.5"></i>
             <span data-bn="হোয়াটসঅ্যাপ" data-en="WhatsApp">হোয়াটসঅ্যাপ</span>
         </a>
     </div>
 
     <!-- JS Scripts -->
     <script>
+        // Mobile Hamburger Menu Toggle Functionality
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('hamburgerIcon');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                menu.classList.add('hidden');
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('hamburgerIcon');
+            if (menu) {
+                menu.classList.add('hidden');
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        }
+
         // Language Toggle Logic
         let currentLang = 'BN';
         let selectedDayVal = '16';
@@ -795,7 +847,6 @@
                 }
             });
             updateDateDisplay();
-            // re-validate active fields if shown
             validateName();
             validatePhone();
             validateService();
@@ -861,6 +912,7 @@
         function validateName() {
             const input = document.getElementById('custName');
             const error = document.getElementById('nameError');
+            if (!input) return true;
             const val = input.value.trim();
 
             if (!val) {
@@ -884,6 +936,7 @@
         function validatePhone() {
             const input = document.getElementById('custPhone');
             const error = document.getElementById('phoneError');
+            if (!input) return true;
             const val = input.value.trim();
             const bdPhoneRegex = /^01[3-9]\d{8}$/;
 
@@ -908,6 +961,7 @@
         function validateService() {
             const select = document.getElementById('modalServiceSelect');
             const error = document.getElementById('serviceError');
+            if (!select) return true;
 
             if (!select.value) {
                 error.innerText = currentLang === 'BN' ? 'অনুগ্রহ করে একটি সার্ভিস সিলেক্ট করুন।' : 'Please select a service.';
@@ -950,7 +1004,6 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
-            // Clear previous validation states
             document.getElementById('bookingForm').reset();
             document.querySelectorAll('#bookingForm input, #bookingForm select').forEach(el => {
                 el.classList.remove('border-red-500', 'border-emerald-500');
