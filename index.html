@@ -21,7 +21,9 @@
                             600: '#CA8A04',
                         },
                         dark: {
+                            950: '#070A0F',
                             900: '#0B0F17',
+                            850: '#0F1522',
                             800: '#111827',
                             700: '#1F2937',
                             600: '#374151'
@@ -50,76 +52,51 @@
             background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
         }
         .glass-card {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(12px);
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .glass-card:hover {
             border-color: rgba(245, 158, 11, 0.4);
         }
-        /* Before-After Slider */
-        .ba-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 1rem;
+        /* Time slot pills styling strictly matching prompt design */
+        .slot-card {
+            background-color: #111827;
+            border: 1px solid #1F2937;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
-        .ba-after {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 50%;
-            overflow: hidden;
-        }
-        .ba-slider {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            width: 4px;
-            background: #F59E0B;
-            cursor: ew-resize;
-            transform: translateX(-50%);
-        }
-        .ba-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #F59E0B;
-            color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
-        }
-        /* Time slot pills */
-        .time-slot-btn {
-            background-color: #1F2937;
-            border: 1px solid #374151;
-            color: #D1D5DB;
-            transition: all 0.2s ease;
-        }
-        .time-slot-btn:hover {
+        .slot-card:hover:not(.disabled) {
             border-color: #F59E0B;
+            background-color: #1F2937;
+            transform: translateY(-2px);
+        }
+        .slot-card.selected {
+            background-color: #1F2937;
+            border-color: #F59E0B;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+        }
+        .slot-card.selected .slot-time {
             color: #F59E0B;
         }
-        .time-slot-btn.selected {
-            background-color: #F59E0B;
-            color: #000;
-            font-weight: 700;
-            border-color: #F59E0B;
+        .slot-card.selected .slot-status {
+            color: #10B981;
+            font-weight: 600;
         }
-        .calendar-day-btn {
-            transition: all 0.2s ease;
+        /* Custom date picker color scheme */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.8) sepia(1) saturate(5) hue-rotate(350deg);
+            cursor: pointer;
         }
-        .calendar-day-btn.selected {
-            background-color: #F59E0B !important;
-            color: #000 !important;
-            font-weight: 700 !important;
+        /* Hero Slide Animation */
+        .hero-slide {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            pointer-events: auto;
         }
         /* Custom scrollbar */
         ::-webkit-scrollbar {
@@ -137,10 +114,10 @@
         }
     </style>
 </head>
-<body class="bg-dark-900 text-gray-100 antialiased selection:bg-amber-500 selection:text-black pb-16 lg:pb-0">
+<body class="bg-dark-900 text-gray-100 antialiased selection:bg-amber-500 selection:text-black pb-20 lg:pb-0">
 
     <!-- Header / Navbar -->
-    <header class="sticky top-0 z-50 glass-card bg-dark-900/90 border-b border-gray-800">
+    <header class="sticky top-0 z-40 glass-card bg-dark-900/90 border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <!-- Brand Logo -->
             <a href="#home" class="flex items-center space-x-3 shrink-0">
@@ -153,68 +130,64 @@
                 </div>
             </a>
 
-            <!-- Desktop Navigation Links (lg breakpoint and above) -->
+            <!-- Desktop Navigation Links -->
             <nav class="hidden lg:flex items-center space-x-8 text-sm font-medium">
                 <a href="#home" class="text-amber-400 hover:text-amber-300 transition" data-bn="হোম" data-en="Home">হোম</a>
                 <a href="#about" class="hover:text-amber-400 transition" data-bn="আমাদের সম্পর্কে" data-en="About Us">আমাদের সম্পর্কে</a>
                 <a href="#services" class="hover:text-amber-400 transition" data-bn="সার্ভিসসমূহ" data-en="Services">সার্ভিসসমূহ</a>
-                <a href="#gallery" class="hover:text-amber-400 transition" data-bn="গ্যালারি" data-en="Gallery">গ্যালারি</a>
                 <a href="#calculator" class="hover:text-amber-400 transition" data-bn="ক্যালকুলেটর" data-en="Calculator">ক্যালকুলেটর</a>
                 <a href="#contact" class="hover:text-amber-400 transition" data-bn="যোগাযোগ" data-en="Contact">যোগাযোগ</a>
             </nav>
 
-            <!-- Right Controls: Language Toggle, Book CTA, Mobile Hamburger Button -->
+            <!-- Right Controls -->
             <div class="flex items-center space-x-2 sm:space-x-4">
-                <!-- Language Toggle Button -->
                 <button id="langToggleBtn" onclick="toggleLanguage()" class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-xs font-semibold text-amber-400 hover:border-amber-500 transition flex items-center gap-1">
                     <i class="fa-solid fa-globe"></i>
                     <span id="currentLangText">BN</span>
                 </button>
 
-                <!-- Desktop / Tablet Booking CTA Button -->
                 <button onclick="openBookingModal()" class="hidden md:inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-black gold-bg-gradient hover:opacity-90 shadow-lg shadow-amber-500/20 transition">
                     <i class="fa-solid fa-calendar-check mr-2"></i>
                     <span data-bn="বুকিং করুন" data-en="Book Appointment">বুকিং করুন</span>
-                </button>
-
-                <!-- Hamburger Menu Button (visible on mobile and tablet: < lg) -->
-                <button id="hamburgerBtn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-gray-300 hover:text-amber-400 hover:bg-gray-800 focus:outline-none transition" aria-label="Toggle Navigation Menu">
-                    <i id="hamburgerIcon" class="fa-solid fa-bars text-xl"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile & Tablet Drawer Menu Dropdown -->
-        <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-800 bg-dark-900/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-2 shadow-2xl transition-all">
-            <a href="#home" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/20" data-bn="হোম" data-en="Home">হোম</a>
-            <a href="#about" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="আমাদের সম্পর্কে" data-en="About Us">আমাদের সম্পর্কে</a>
-            <a href="#services" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="সার্ভিসসমূহ" data-en="Services">সার্ভিসসমূহ</a>
-            <a href="#gallery" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="গ্যালারি" data-en="Gallery">গ্যালারি</a>
-            <a href="#calculator" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="ক্যালকুলেটর" data-en="Calculator">ক্যালকুলেটর</a>
-            <a href="#contact" onclick="closeMobileMenu()" class="block py-2.5 px-4 rounded-xl text-gray-200 hover:text-amber-400 hover:bg-gray-800 transition font-medium" data-bn="যোগাযোগ" data-en="Contact">যোগাযোগ</a>
-            
-            <div class="pt-2">
-                <button onclick="closeMobileMenu(); openBookingModal();" class="w-full py-3 rounded-xl font-bold text-black gold-bg-gradient hover:opacity-90 shadow-lg shadow-amber-500/20 text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <span data-bn="অ্যাপয়েন্টমেন্ট বুক করুন" data-en="Book Appointment">অ্যাপয়েন্টমেন্ট বুক করুন</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="relative py-12 sm:py-16 lg:py-24 overflow-hidden">
+    <section id="home" class="relative py-16 sm:py-24 lg:py-32 overflow-hidden min-h-[85vh] flex items-center justify-center">
+        <!-- Background Slider Container -->
+        <div class="absolute inset-0 z-0">
+            <div class="hero-slide active absolute inset-0 bg-cover bg-center transition-all duration-1000" style="background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=1920');"></div>
+            <div class="hero-slide absolute inset-0 bg-cover bg-center transition-all duration-1000" style="background-image: url('https://images.unsplash.com/photo-1517832606589-715006d31326?auto=format&fit=crop&q=80&w=1920');"></div>
+            <div class="hero-slide absolute inset-0 bg-cover bg-center transition-all duration-1000" style="background-image: url('https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=1920');"></div>
+            <div class="hero-slide absolute inset-0 bg-cover bg-center transition-all duration-1000" style="background-image: url('https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=1920');"></div>
+            
+            <div class="absolute inset-0 bg-gradient-to-b from-dark-900/90 via-dark-900/80 to-dark-900"></div>
+        </div>
+
+        <!-- Slider Navigation Controls -->
+        <button onclick="prevHeroSlide()" class="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full glass-card hover:bg-amber-500 hover:text-black text-amber-400 flex items-center justify-center transition border border-gray-700 shadow-xl">
+            <i class="fa-solid fa-chevron-left text-lg"></i>
+        </button>
+        <button onclick="nextHeroSlide()" class="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full glass-card hover:bg-amber-500 hover:text-black text-amber-400 flex items-center justify-center transition border border-gray-700 shadow-xl">
+            <i class="fa-solid fa-chevron-right text-lg"></i>
+        </button>
+
+        <!-- Main Hero Content -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-medium mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-medium mb-6 backdrop-blur-md">
                     <i class="fa-solid fa-crown text-amber-400"></i>
                     <span data-bn="মিরপুর ১১.৫ এর এক নম্বর পুরুষদের স্টাইলিং হাব" data-en="Mirpur 11.5's #1 Men's Styling Lounge">মিরপুর ১১.৫ এর এক নম্বর পুরুষদের স্টাইলিং হাব</span>
                 </div>
-                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+                
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight drop-shadow-lg">
                     <span data-bn="নতুন লুকে নিজেকে আবিষ্কার করুন" data-en="Discover Your New Look">নতুন লুকে নিজেকে আবিষ্কার করুন</span> <br>
                     <span class="gold-gradient-text">— Hair Matrix Studio</span>
                 </h1>
-                <p class="text-gray-400 text-sm sm:text-base lg:text-lg mb-8 leading-relaxed" data-bn="আমাদের অভিজ্ঞ স্টাইলিস্টদের হাতে আপনার চুল, দাড়ি ও স্কিনের সঠিক যত্ন নিন। প্রিমিয়াম পরিবেশ ও প্রফেশনাল সার্ভিসের নিশ্চয়তা।" data-en="Get expert hair, beard, and skincare treatment from our professional stylists. Guaranteed premium ambience and services.">
+                
+                <p class="text-gray-300 text-sm sm:text-base lg:text-lg mb-8 leading-relaxed max-w-2xl mx-auto drop-shadow" data-bn="আমাদের অভিজ্ঞ স্টাইলিস্টদের হাতে আপনার চুল, দাড়ি ও স্কিনের সঠিক যত্ন নিন। প্রিমিয়াম পরিবেশ ও প্রফেশনাল সার্ভিসের নিশ্চয়তা।" data-en="Get expert hair, beard, and skincare treatment from our professional stylists. Guaranteed premium ambience and services.">
                     আমাদের অভিজ্ঞ স্টাইলিস্টদের হাতে আপনার চুল, দাড়ি ও স্কিনের সঠিক যত্ন নিন। প্রিমিয়াম পরিবেশ ও প্রফেশনাল সার্ভিসের নিশ্চয়তা।
                 </p>
 
@@ -229,153 +202,12 @@
                     </a>
                 </div>
 
-                <!-- Highlights Badges -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-8 border-t border-gray-800">
-                    <div class="p-4 rounded-xl glass-card text-center">
-                        <i class="fa-solid fa-scissors text-amber-400 text-2xl mb-2"></i>
-                        <h4 class="font-bold text-white text-sm" data-bn="এক্সপার্ট কাট" data-en="Expert Haircut">এক্সপার্ট কাট</h4>
-                        <p class="text-xs text-gray-400" data-bn="ট্রেন্ডি ও ক্লাসিক স্টাইল" data-en="Trendy & Classic Styles">ট্রেন্ডি ও ক্লাসিক স্টাইল</p>
-                    </div>
-                    <div class="p-4 rounded-xl glass-card text-center">
-                        <i class="fa-solid fa-user-ninja text-amber-400 text-2xl mb-2"></i>
-                        <h4 class="font-bold text-white text-sm" data-bn="বিয়ার্ড গ্রুমিং" data-en="Beard Grooming">বিয়ার্ড গ্রুমিং</h4>
-                        <p class="text-xs text-gray-400" data-bn="পেশাদার শেপিং" data-en="Professional Shaping">পেশাদার শেপিং</p>
-                    </div>
-                    <div class="p-4 rounded-xl glass-card text-center">
-                        <i class="fa-solid fa-sparkles text-amber-400 text-2xl mb-2"></i>
-                        <h4 class="font-bold text-white text-sm" data-bn="কেরাটিন ও ট্রিম" data-en="Keratin Care">কেরাটিন ও ট্রিম</h4>
-                        <p class="text-xs text-gray-400" data-bn="স্মুথ ও সিল্কি হেয়ার" data-en="Smooth & Shiny Hair">স্মুথ ও সিল্কি হেয়ার</p>
-                    </div>
-                    <div class="p-4 rounded-xl glass-card text-center">
-                        <i class="fa-solid fa-star text-amber-400 text-2xl mb-2"></i>
-                        <h4 class="font-bold text-white text-sm" data-bn="১০০% রেটিং" data-en="100% Recommended">১০০% রেটিং</h4>
-                        <p class="text-xs text-gray-400" data-bn="ফেসবুক রিভিউ অনুযায়ী" data-en="Based on Reviews">ফেসবুক রিভিউ অনুযায়ী</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Before & After Comparison Section -->
-    <section id="about" class="py-16 bg-dark-800/50 border-y border-gray-800">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-10">
-                <span class="text-amber-400 font-semibold text-sm uppercase tracking-wider" data-bn="বিফোর / আফটার" data-en="Before / After">বিফোর / আফটার</span>
-                <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1" data-bn="অনবদ্য পরিবর্তন অনুভব করুন" data-en="Experience Remarkable Transformations">অনবদ্য পরিবর্তন অনুভব করুন</h2>
-            </div>
-
-            <!-- Interactive Before After Slider Container -->
-            <div class="ba-container max-w-3xl mx-auto aspect-[4/3] sm:aspect-[16/9] shadow-2xl border border-gray-700" id="baContainer">
-                <!-- Before Image (Base) -->
-                <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=1000" alt="Before Grooming" class="w-full h-full object-cover">
-                <div class="absolute bottom-4 left-4 bg-black/70 backdrop-blur text-white px-3 py-1 rounded-md text-xs font-semibold" data-bn="পূর্বে" data-en="BEFORE">পূর্বে</div>
-
-                <!-- After Image (Overlay) -->
-                <div class="ba-after" id="baAfter">
-                    <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=1000" alt="After Grooming" class="absolute top-0 left-0 w-full h-full object-cover" style="max-width: none;">
-                    <div class="absolute bottom-4 right-4 bg-amber-500 text-black font-bold px-3 py-1 rounded-md text-xs" data-bn="পরে" data-en="AFTER">পরে</div>
-                </div>
-
-                <!-- Slider Handle -->
-                <div class="ba-slider" id="baSlider">
-                    <div class="ba-button">
-                        <i class="fa-solid fa-arrows-left-right text-xs"></i>
-                    </div>
-                </div>
-            </div>
-            <p class="text-center text-xs text-gray-500 mt-4" data-bn="* মাউস বা আঙুল টেনে আগে ও পরের পরিবর্তন দেখুন" data-en="* Drag left or right to compare before & after">* মাউস বা আঙুল টেনে আগে ও পরের পরিবর্তন দেখুন</p>
-        </div>
-    </section>
-
-    <!-- Gallery Section with Carousel Grid -->
-    <section id="gallery" class="py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <span class="text-amber-400 font-semibold text-sm uppercase tracking-wider" data-bn="পোর্টফোলিও" data-en="Portfolio">পোর্টফোলিও</span>
-                <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1" data-bn="আমাদের সাম্প্রতিক সেরা ৬টি স্টাইলিং কাজ" data-en="Our Recent Top 6 Styling Works">আমাদের সাম্প্রতিক সেরা ৬টি স্টাইলিং কাজ</h2>
-            </div>
-
-            <!-- Carousel Grid Container (1 col on mobile, 2 on tablet, 3 on desktop) -->
-            <div class="relative max-w-5xl mx-auto">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="galleryGrid">
-                    <!-- Slide 1 -->
-                    <div class="glass-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1517832606589-715006d31326?auto=format&fit=crop&q=80&w=800', 'Fade Cut & Beard Contour')">
-                        <div class="relative aspect-[4/5] overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1517832606589-715006d31326?auto=format&fit=crop&q=80&w=800" alt="Fade Cut" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                                <div>
-                                    <span class="text-amber-400 text-xs font-bold uppercase" data-bn="হেয়ারকাট" data-en="Haircut">হেয়ারকাট</span>
-                                    <h3 class="text-white font-bold text-base" data-bn="ফেড কাট ও বিয়ার্ড ট্রিম" data-en="Fade Cut & Beard Contour">ফেড কাট ও বিয়ার্ড ট্রিম</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 2 -->
-                    <div class="glass-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80&w=800', 'Royal Beard Sculpting')">
-                        <div class="relative aspect-[4/5] overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80&w=800" alt="Beard Grooming" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                                <div>
-                                    <span class="text-amber-400 text-xs font-bold uppercase" data-bn="বিয়ার্ড কেয়ার" data-en="Beard Care">বিয়ার্ড কেয়ার</span>
-                                    <h3 class="text-white font-bold text-base" data-bn="রয়েল বিয়ার্ড শেপিং" data-en="Royal Beard Sculpting">রয়েল বিয়ার্ড শেপিং</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 3 -->
-                    <div class="glass-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=800', 'Modern Undercut Styling')">
-                        <div class="relative aspect-[4/5] overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=800" alt="Modern Undercut" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                                <div>
-                                    <span class="text-amber-400 text-xs font-bold uppercase" data-bn="হেয়ার স্টাইলিং" data-en="Hair Styling">হেয়ার স্টাইলিং</span>
-                                    <h3 class="text-white font-bold text-base" data-bn="মডার্ন আন্ডারকাট স্টাইল" data-en="Modern Undercut Styling">মডার্ন আন্ডারকাট স্টাইল</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 4 -->
-                    <div class="glass-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=800', 'Keratin & Hair Spa')">
-                        <div class="relative aspect-[4/5] overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=800" alt="Hair Spa" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                                <div>
-                                    <span class="text-amber-400 text-xs font-bold uppercase" data-bn="হেয়ার ট্রিটমেন্ট" data-en="Hair Treatment">হেয়ার ট্রিটমেন্ট</span>
-                                    <h3 class="text-white font-bold text-base" data-bn="কেরাটিন ও প্রোটিন স্পা" data-en="Keratin & Hair Spa">কেরাটিন ও প্রোটিন স্পা</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 5 -->
-                    <div class="glass-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800', 'Men Hair Color & Highlights')">
-                        <div class="relative aspect-[4/5] overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800" alt="Hair Color" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                                <div>
-                                    <span class="text-amber-400 text-xs font-bold uppercase" data-bn="কালারিং" data-en="Coloring">কালারিং</span>
-                                    <h3 class="text-white font-bold text-base" data-bn="হেয়ার কালার ও হাইলাইটস" data-en="Men Hair Color & Highlights">হেয়ার কালার ও হাইলাইটস</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 6 -->
-                    <div class="glass-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=800', 'Gents Facial & Scalp Care')">
-                        <div class="relative aspect-[4/5] overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=800" alt="Gents Facial" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                                <div>
-                                    <span class="text-amber-400 text-xs font-bold uppercase" data-bn="ফেসিয়াল" data-en="Facial">ফেসিয়াল</span>
-                                    <h3 class="text-white font-bold text-base" data-bn="জেন্টলম্যান ফেসিয়াল ও স্কেল্প কেয়ার" data-en="Gents Facial & Scalp Care">জেন্টলম্যান ফেসিয়াল ও স্কেল্প কেয়ার</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                <!-- Indicator Dots -->
+                <div class="flex items-center justify-center gap-2.5 mt-8 z-20 relative">
+                    <button onclick="goToHeroSlide(0)" class="hero-dot w-3 h-3 rounded-full bg-amber-500 transition-all shadow"></button>
+                    <button onclick="goToHeroSlide(1)" class="hero-dot w-3 h-3 rounded-full bg-gray-600 hover:bg-gray-400 transition-all shadow"></button>
+                    <button onclick="goToHeroSlide(2)" class="hero-dot w-3 h-3 rounded-full bg-gray-600 hover:bg-gray-400 transition-all shadow"></button>
+                    <button onclick="goToHeroSlide(3)" class="hero-dot w-3 h-3 rounded-full bg-gray-600 hover:bg-gray-400 transition-all shadow"></button>
                 </div>
             </div>
         </div>
@@ -390,7 +222,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Service Card 1 -->
+                <!-- 1 -->
                 <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
@@ -401,11 +233,11 @@
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-gray-800">
                         <span class="text-amber-400 font-bold text-lg" data-bn="৳ ২৫০ – ৳ ৫০০" data-en="BDT 250 – 500">৳ ২৫০ – ৳ ৫০০</span>
-                        <button onclick="openBookingModal('Premium Haircut')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3 py-1.5 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                        <button onclick="openBookingModal('Premium Haircut')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
                     </div>
                 </div>
 
-                <!-- Service Card 2 -->
+                <!-- 2 -->
                 <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
@@ -416,11 +248,11 @@
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-gray-800">
                         <span class="text-amber-400 font-bold text-lg" data-bn="৳ ১৫০ – ৳ ৩০০" data-en="BDT 150 – 300">৳ ১৫০ – ৳ ৩০০</span>
-                        <button onclick="openBookingModal('Beard Design')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3 py-1.5 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                        <button onclick="openBookingModal('Beard Design')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
                     </div>
                 </div>
 
-                <!-- Service Card 3 -->
+                <!-- 3 -->
                 <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
@@ -431,11 +263,11 @@
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-gray-800">
                         <span class="text-amber-400 font-bold text-lg" data-bn="৳ ১,৫০০ – ৳ ৩,৫০০" data-en="BDT 1,500 – 3,500">৳ ১,৫০০ – ৳ ৩,৫০০</span>
-                        <button onclick="openBookingModal('Keratin Treatment')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3 py-1.5 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                        <button onclick="openBookingModal('Keratin Treatment')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
                     </div>
                 </div>
 
-                <!-- Service Card 4 -->
+                <!-- 4 -->
                 <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
@@ -446,11 +278,11 @@
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-gray-800">
                         <span class="text-amber-400 font-bold text-lg" data-bn="৳ ৫০০ – ৳ ১,৮০০" data-en="BDT 500 – 1,800">৳ ৫০০ – ৳ ১,৮০০</span>
-                        <button onclick="openBookingModal('Hair Color')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3 py-1.5 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                        <button onclick="openBookingModal('Hair Color')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
                     </div>
                 </div>
 
-                <!-- Service Card 5 -->
+                <!-- 5 -->
                 <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
@@ -461,11 +293,11 @@
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-gray-800">
                         <span class="text-amber-400 font-bold text-lg" data-bn="৳ ৬০০ – ৳ ১,৫০০" data-en="BDT 600 – 1,500">৳ ৬০০ – ৳ ১,৫০০</span>
-                        <button onclick="openBookingModal('Gents Facial')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3 py-1.5 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                        <button onclick="openBookingModal('Gents Facial')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
                     </div>
                 </div>
 
-                <!-- Service Card 6 -->
+                <!-- 6 -->
                 <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
@@ -476,7 +308,52 @@
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-gray-800">
                         <span class="text-amber-400 font-bold text-lg" data-bn="৳ ৫০০ – ৳ ১,০০০" data-en="BDT 500 – 1,000">৳ ৫০০ – ৳ ১,০০০</span>
-                        <button onclick="openBookingModal('Dandruff Spa')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3 py-1.5 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                        <button onclick="openBookingModal('Dandruff Spa')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                    </div>
+                </div>
+
+                <!-- 7 -->
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-pump-soap"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2" data-bn="শেভ ও ফেস ক্লিনআপ" data-en="Shave & Face Cleanup">শেভ ও ফেস ক্লিনআপ</h3>
+                        <p class="text-gray-400 text-sm mb-4" data-bn="স্মুথ শেভিং, স্ক্রাবিং ও ফেসিয়াল স্টিম ক্লিনআপ ট্রিটমেন্ট।" data-en="Smooth shaving, exfoliation scrubbing, and facial steam cleanup.">স্মুথ শেভিং, স্ক্রাবিং ও ফেসিয়াল স্টিম ক্লিনআপ ট্রিটমেন্ট।</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-800">
+                        <span class="text-amber-400 font-bold text-lg" data-bn="৳ ২০০ – ৳ ৪০০" data-en="BDT 200 – 400">৳ ২০০ – ৳ ৪০০</span>
+                        <button onclick="openBookingModal('Shave Cleanup')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                    </div>
+                </div>
+
+                <!-- 8 -->
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2" data-bn="ম্যানিকিউর ও পেডিকিউর" data-en="Manicure & Pedicure">ম্যানিকিউর ও পেডিকিউর</h3>
+                        <p class="text-gray-400 text-sm mb-4" data-bn="হাত ও পায়ের গভীর পরিচ্ছন্নতা, নখ শেপিং ও মাসাজ।" data-en="Deep hand and foot cleansing, nail shaping, and relaxing massage.">হাত ও পায়ের গভীর পরিচ্ছন্নতা, নখ শেপিং ও মাসাজ।</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-800">
+                        <span class="text-amber-400 font-bold text-lg" data-bn="৳ ৪০০ – ৳ ৮০০" data-en="BDT 400 – 800">৳ ৪০০ – ৳ ৮০০</span>
+                        <button onclick="openBookingModal('Mani Pedi')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
+                    </div>
+                </div>
+
+                <!-- 9 -->
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-face-smile-beam"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2" data-bn="স্কিন কেয়ার ও ট্রিটমেন্ট" data-en="Advanced Skincare">স্কিন কেয়ার ও ট্রিটমেন্ট</h3>
+                        <p class="text-gray-400 text-sm mb-4" data-bn="একনে রিমুভাল, ডার্ক স্পট ট্রিটমেন্ট ও অ্যান্টি-এজিং কেয়ার।" data-en="Acne removal, dark spot treatment, and anti-aging skincare care.">একনে রিমুভাল, ডার্ক স্পট ট্রিটমেন্ট ও অ্যান্টি-এজিং কেয়ার।</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-800">
+                        <span class="text-amber-400 font-bold text-lg" data-bn="৳ ৮০০ – ৳ ২,০০০" data-en="BDT 800 – 2,000">৳ ৮০০ – ৳ ২,০০০</span>
+                        <button onclick="openBookingModal('Skin Treatment')" class="text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black px-3.5 py-2 rounded-lg transition font-semibold" data-bn="বুক করুন" data-en="Book Now">বুক করুন</button>
                     </div>
                 </div>
             </div>
@@ -490,7 +367,7 @@
                 <div class="text-center mb-8">
                     <span class="text-amber-400 font-semibold text-xs uppercase tracking-widest" data-bn="বাজেট হিসাব" data-en="Budget Estimator">বাজেট হিসাব</span>
                     <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1" data-bn="সার্ভিস মূল্য ক্যালকুলেটর" data-en="Service Cost Calculator">সার্ভিস মূল্য ক্যালকুলেটর</h2>
-                    <p class="text-gray-400 text-sm mt-1" data-bn="পছন্দের সার্ভিসগুলো সিলেক্ট করে আনুমানিক খরচ হিসাব করুন" data-en="Select services to estimate your total grooming bill">পছন্দের সার্ভিসগুলো সিলেক্ট করে আনুমানিক খরচ হিসাব করুন</p>
+                    <p class="text-gray-400 text-sm mt-1" data-bn="পছন্দের সার্ভিসগুলো সিলেক্ট করে আনুমানিক খরচ হিসাব করুন" data-en="Select services to calculate your total estimated bill">পছন্দের সার্ভিসগুলো সিলেক্ট করে আনুমানিক খরচ হিসাব করুন</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -505,41 +382,57 @@
                     <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
                         <div class="flex items-center gap-3">
                             <input type="checkbox" value="200" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
-                            <span class="text-sm font-medium text-white" data-bn="বিয়ার্ড ট্রিম ও শেপ" data-en="Beard Trim & Shape">বিয়ার্ড ট্রিম ও শেপ</span>
+                            <span class="text-sm font-medium text-white" data-bn="বিয়ার্ড ডিজাইন ও কেয়ার" data-en="Beard Design & Care">বিয়ার্ড ডিজাইন ও কেয়ার</span>
                         </div>
                         <span class="text-amber-400 font-bold text-sm">৳ ২০০</span>
                     </label>
 
                     <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" value="800" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
-                            <span class="text-sm font-medium text-white" data-bn="হেয়ার কালারিং" data-en="Hair Coloring">হেয়ার কালারিং</span>
-                        </div>
-                        <span class="text-amber-400 font-bold text-sm">৳ ৮০০</span>
-                    </label>
-
-                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" value="800" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
-                            <span class="text-sm font-medium text-white" data-bn="ফেসিয়াল ট্রিটমেন্ট" data-en="Facial Treatment">ফেসিয়াল ট্রিটমেন্ট</span>
-                        </div>
-                        <span class="text-amber-400 font-bold text-sm">৳ ৮০০</span>
-                    </label>
-
-                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
-                        <div class="flex items-center gap-3">
                             <input type="checkbox" value="2000" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
-                            <span class="text-sm font-medium text-white" data-bn="কেরাটিন স্ট্রেটনিং" data-en="Keratin Straightening">কেরাটিন স্ট্রেটনিং</span>
+                            <span class="text-sm font-medium text-white" data-bn="কেরাটিন ও রিবন্ডিং" data-en="Keratin & Rebonding">কেরাটিন ও রিবন্ডিং</span>
                         </div>
                         <span class="text-amber-400 font-bold text-sm">৳ ২,০০০</span>
                     </label>
 
                     <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
                         <div class="flex items-center gap-3">
+                            <input type="checkbox" value="800" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
+                            <span class="text-sm font-medium text-white" data-bn="হেয়ার কালার ও হাইলাইটস" data-en="Hair Color & Highlights">হেয়ার কালার ও হাইলাইটস</span>
+                        </div>
+                        <span class="text-amber-400 font-bold text-sm">৳ ৮০০</span>
+                    </label>
+
+                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="800" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
+                            <span class="text-sm font-medium text-white" data-bn="ফেসিয়াল ও স্কিন কেয়ার" data-en="Facial & Skincare">ফেসিয়াল ও স্কিন কেয়ার</span>
+                        </div>
+                        <span class="text-amber-400 font-bold text-sm">৳ ৮০০</span>
+                    </label>
+
+                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
+                        <div class="flex items-center gap-3">
                             <input type="checkbox" value="600" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
-                            <span class="text-sm font-medium text-white" data-bn="হেড স্পা ও ম্যাসাজ" data-en="Head Spa & Massage">হেড স্পা ও ম্যাসাজ</span>
+                            <span class="text-sm font-medium text-white" data-bn="হেড ও ড্যান্ড্রাফ স্পা" data-en="Head & Dandruff Spa">হেড ও ড্যান্ড্রাফ স্পা</span>
                         </div>
                         <span class="text-amber-400 font-bold text-sm">৳ ৬০০</span>
+                    </label>
+
+                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="250" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
+                            <span class="text-sm font-medium text-white" data-bn="শেভ ও ফেস ক্লিনআপ" data-en="Shave & Face Cleanup">শেভ ও ফেস ক্লিনআপ</span>
+                        </div>
+                        <span class="text-amber-400 font-bold text-sm">৳ ২৫০</span>
+                    </label>
+
+                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/80 border border-gray-700 cursor-pointer hover:border-amber-500 transition">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="500" class="calc-item w-5 h-5 accent-amber-500 rounded" onchange="calculateTotal()">
+                            <span class="text-sm font-medium text-white" data-bn="ম্যানিকিউর ও পেডিকিউর" data-en="Manicure & Pedicure">ম্যানিকিউর ও পেডিকিউর</span>
+                        </div>
+                        <span class="text-amber-400 font-bold text-sm">৳ ৫০০</span>
                     </label>
                 </div>
 
@@ -548,7 +441,7 @@
                         <span class="text-xs text-gray-400 uppercase font-semibold" data-bn="সর্বমোট আনুমানিক বিল" data-en="Total Estimated Bill">সর্বমোট আনুমানিক বিল</span>
                         <div class="text-3xl font-black text-amber-400 mt-0.5" id="totalPrice">৳ ০</div>
                     </div>
-                    <button onclick="openBookingModalWithBudget()" class="mt-4 sm:mt-0 px-6 py-3 rounded-xl font-bold text-black gold-bg-gradient hover:opacity-90 transition shadow-lg shadow-amber-500/20 text-sm">
+                    <button onclick="openBookingModalWithBudget()" class="mt-4 sm:mt-0 px-6 py-3 rounded-xl font-bold text-black gold-bg-gradient hover:opacity-90 transition text-sm">
                         <span data-bn="এই বাজেটে বুক করুন" data-en="Book With This Budget">এই বাজেটে বুক করুন</span>
                     </button>
                 </div>
@@ -556,100 +449,58 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="py-16 bg-dark-800/50 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <span class="text-amber-400 font-semibold text-sm uppercase tracking-wider" data-bn="গ্রাহকদের মতামত" data-en="Testimonials">গ্রাহকদের মতামত</span>
-                <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1" data-bn="গ্রাহকদের মন্তব্য ও অভিজ্ঞতা" data-en="Client Reviews & Feedback">গ্রাহকদের মন্তব্য ও অভিজ্ঞতা</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-card p-6 rounded-2xl">
-                    <div class="flex text-amber-400 gap-1 text-sm mb-3">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-gray-300 text-sm mb-4 leading-relaxed" data-bn="মিরপুর সাড়ে ১১ এর সবচেয়ে সেরা জেন্টলম্যান পার্লার। হেয়ারকাট আর বিয়ার্ড শেপিং অসাধারণ লেগেছে।" data-en="Best gents parlour in Mirpur 11.5. Their haircut and beard shaping were exceptional!">"মিরপুর সাড়ে ১১ এর সবচেয়ে সেরা জেন্টলম্যান পার্লার। হেয়ারকাট আর বিয়ার্ড শেপিং অসাধারণ লেগেছে।"</p>
-                    <div class="font-bold text-white text-sm" data-bn="তৌফিক রহমান" data-en="Towfique Rahman">তৌফিক রহমান</div>
-                    <div class="text-xs text-gray-500" data-bn="লোকাল ক্লায়েন্ট" data-en="Local Client">লোকাল ক্লায়েন্ট</div>
-                </div>
-
-                <div class="glass-card p-6 rounded-2xl">
-                    <div class="flex text-amber-400 gap-1 text-sm mb-3">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-gray-300 text-sm mb-4 leading-relaxed" data-bn="কেরাটিন ট্রিটমেন্ট নিয়েছিলাম, সার্ভিস ও বিহেভিয়ার খুব প্রফেশনাল। অত্যন্ত যত্নসহকারে কাজ করেন।" data-en="Took Keratin treatment here. Very professional behavior and highly detailed service.">"কেরাটিন ট্রিটমেন্ট নিয়েছিলাম, সার্ভিস ও বিহেভিয়ার খুব প্রফেশনাল। অত্যন্ত যত্নসহকারে কাজ করেন।"</p>
-                    <div class="font-bold text-white text-sm" data-bn="আসিফ আহমেদ" data-en="Asif Ahmed">আসিফ আহমেদ</div>
-                    <div class="text-xs text-gray-500" data-bn="নিয়মিত কাস্টমার" data-en="Regular Client">নিয়মিত কাস্টমার</div>
-                </div>
-
-                <div class="glass-card p-6 rounded-2xl">
-                    <div class="flex text-amber-400 gap-1 text-sm mb-3">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-gray-300 text-sm mb-4 leading-relaxed" data-bn="পরিবেশ খুব পরিচ্ছন্ন এবং টুলসগুলো জীবাণুমুক্ত রাখা হয়। মিরপুরে এমন মানের স্টুডিও কমই আছে।" data-en="Environment is super clean and instruments are disinfected. Rare high quality studio in Mirpur.">"পরিবেশ খুব পরিচ্ছন্ন এবং টুলসগুলো জীবাণুমুক্ত রাখা হয়। মিরপুরে এমন মানের স্টুডিও কমই আছে।"</p>
-                    <div class="font-bold text-white text-sm" data-bn="মাহমুদুল হাসান" data-en="Mahmudul Hasan">মাহমুদুল হাসান</div>
-                    <div class="text-xs text-gray-500" data-bn="পল্লবী, ঢাকা" data-en="Pallabi, Dhaka">পল্লবী, ঢাকা</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Location & Contact Section -->
-    <section id="contact" class="py-16">
+    <section id="contact" class="py-16 bg-dark-800/30 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div>
-                    <span class="text-amber-400 font-semibold text-sm uppercase tracking-wider" data-bn="লোকেশন ও সময়" data-en="Location & Hours">লোকেশন ও সময়</span>
-                    <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1 mb-6" data-bn="আমাদের স্টুডিওতে আপনাকে স্বাগতম" data-en="Welcome to Our Studio">আমাদের স্টুডিওতে আপনাকে স্বাগতম</h2>
+            <span class="text-amber-400 font-semibold text-xs sm:text-sm uppercase tracking-wider" data-bn="লোকেশন ও সময়" data-en="Location & Hours">লোকেশন ও সময়</span>
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-white mt-1 mb-8" data-bn="আমাদের স্টুডিওতে আপনাকে স্বাগতম" data-en="Welcome to Our Studio">আমাদের স্টুডিওতে আপনাকে স্বাগতম</h2>
 
-                    <div class="space-y-4">
-                        <div class="flex items-start gap-4 glass-card p-4 rounded-xl">
-                            <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-location-dot"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-sm" data-bn="ঠিকানা" data-en="Address">ঠিকানা</h4>
-                                <p class="text-gray-400 text-xs sm:text-sm mt-0.5" data-bn="হাউজ- ৭/৩, রোড- ০৩, পল্লবী, সেতারা কনভেনশন হলের পাশে, মিরপুর সাড়ে ১১, ঢাকা, বাংলাদেশ।" data-en="House- 7/3, Road- 03, Pallabi, Beside Setara Convention Hall, Mirpur 11.5, Dhaka, Bangladesh.">হাউজ- ৭/৩, রোড- ০৩, পল্লবী, সেতারা কনভেনশন হলের পাশে, মিরপুর সাড়ে ১১, ঢাকা, বাংলাদেশ।</p>
-                            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-6 space-y-4">
+                    <div class="flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-[#0E131F]/90 border border-gray-800 hover:border-amber-500/40 transition">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-location-dot text-base"></i>
                         </div>
-
-                        <div class="flex items-start gap-4 glass-card p-4 rounded-xl">
-                            <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-clock"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-sm" data-bn="খোলা থাকার সময়" data-en="Working Hours">খোলা থাকার সময়</h4>
-                                <p class="text-gray-400 text-xs sm:text-sm mt-0.5" data-bn="প্রতিদিন সকাল ১০:০০ টা – রাত ১০:০০ টা পর্যন্ত" data-en="Everyday 10:00 AM – 10:00 PM">প্রতিদিন সকাল ১০:০০ টা – রাত ১০:০০ টা পর্যন্ত</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-4 glass-card p-4 rounded-xl">
-                            <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-phone"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-sm" data-bn="হটলাইন / বুকিং" data-en="Hotline / Booking">হটলাইন / বুকিং</h4>
-                                <p class="text-amber-400 font-bold text-sm mt-0.5">+880 1755-839901</p>
-                            </div>
+                        <div>
+                            <h4 class="font-bold text-white text-sm sm:text-base" data-bn="ঠিকানা" data-en="Address">ঠিকানা</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm leading-relaxed mt-0.5" data-bn="হাউজ- ৭/৩, রোড- ০৩, পল্লবী, সেতারা কনভেনশন হলের পাশে, মিরপুর সাড়ে ১১, ঢাকা, বাংলাদেশ।" data-en="House- 7/3, Road- 03, Pallabi, Beside Setara Convention Hall, Mirpur 11.5, Dhaka, Bangladesh.">হাউজ- ৭/৩, রোড- ০৩, পল্লবী, সেতারা কনভেনশন হলের পাশে, মিরপুর সাড়ে ১১, ঢাকা, বাংলাদেশ।</p>
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap gap-4 mt-8">
-                        <a href="https://wa.me/8801755839901" target="_blank" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center gap-2 transition shadow-lg shadow-emerald-600/20">
+                    <div class="flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-[#0E131F]/90 border border-gray-800 hover:border-amber-500/40 transition">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-clock text-base"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-sm sm:text-base" data-bn="খোলা থাকার সময়" data-en="Working Hours">খোলা থাকার সময়</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm mt-0.5" data-bn="প্রতিদিন সকাল ১০:০০ টা – রাত ১০:০০ টা পর্যন্ত" data-en="Everyday 10:00 AM – 10:00 PM">প্রতিদিন সকাল ১০:০০ টা – রাত ১০:০০ টা পর্যন্ত</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-[#0E131F]/90 border border-gray-800 hover:border-amber-500/40 transition">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-phone text-base"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-sm sm:text-base" data-bn="হটলাইন / বুকিং" data-en="Hotline / Booking">হটলাইন / বুকিং</h4>
+                            <p class="text-amber-400 font-bold text-sm sm:text-base mt-0.5">+880 1755-839901</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-4 pt-3">
+                        <a href="https://wa.me/8801755839901" target="_blank" class="px-6 py-3.5 rounded-xl bg-[#00A884] hover:bg-[#008f70] text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition shadow-lg shadow-emerald-600/20">
                             <i class="fa-brands fa-whatsapp text-lg"></i>
-                            <span data-bn="হোয়াটসঅ্যাপ চ্যাট" data-en="WhatsApp Chat">হোয়াটসঅ্যাপ চ্যাট</span>
+                            <span data-bn="হোয়াটসঅ্যাপ চ্যাট" data-en="WhatsApp Chat">হোয়াটসঅ্যাপ চ্যাট</span>
                         </a>
-                        <button onclick="openBookingModal()" class="px-6 py-3 rounded-xl gold-bg-gradient text-black font-bold text-sm flex items-center gap-2 transition shadow-lg shadow-amber-500/20">
+                        <button onclick="openBookingModal()" class="px-6 py-3.5 rounded-xl gold-bg-gradient text-black font-bold text-xs sm:text-sm flex items-center gap-2 transition shadow-lg shadow-amber-500/20 hover:opacity-90">
                             <i class="fa-solid fa-calendar-check"></i>
                             <span data-bn="বুকিং করুন" data-en="Book Appointment">বুকিং করুন</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Google Maps Iframe -->
-                <div class="h-80 sm:h-96 rounded-2xl overflow-hidden border border-gray-800 glass-card">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.098028710323!2d90.3622!3d23.815!2m3!1f0!1f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c1103c812d6f%3A0x286377e8a93a1c50!2sPallabi%2C%20Mirpur%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1700000000000!5m2!1sen!2sbd" class="w-full h-full border-0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div class="lg:col-span-6 h-72 sm:h-96 rounded-2xl overflow-hidden border border-gray-800 shadow-2xl relative">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.098028710323!2d90.3622!3d23.815!2m3!1f0!1f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c1103c812d6f%3A0x286377e8a93a1c50!2sPallabi%2C%20Mirpur%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1700000000000!5m2!1sen!2sbd" class="w-full h-full border-0 filter grayscale-[20%] contrast-[110%]" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
@@ -661,179 +512,257 @@
             <div>
                 © 2026 <span class="text-amber-400 font-semibold">Hair Matrix Studio</span>. All Rights Reserved.
             </div>
-            <div class="flex items-center space-x-4">
-                <a href="https://www.facebook.com/real.hairmatrixstudio" target="_blank" class="text-gray-400 hover:text-amber-400 text-lg transition"><i class="fa-brands fa-facebook"></i></a>
-                <a href="https://wa.me/8801755839901" target="_blank" class="text-gray-400 hover:text-emerald-400 text-lg transition"><i class="fa-brands fa-whatsapp"></i></a>
-            </div>
         </div>
     </footer>
 
-    <!-- Modern Dynamic Booking Modal with Full Real-time Form Validation -->
-    <div id="bookingModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="glass-card max-w-lg w-full p-6 sm:p-8 rounded-3xl border border-amber-500/40 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeBookingModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">
+    <!-- Mobile Bottom Navigation Bar -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E131F]/95 backdrop-blur-xl border-t border-gray-800 px-2 py-2">
+        <div class="grid grid-cols-5 text-center items-center">
+            <a href="#home" onclick="setActiveNav(this)" class="nav-item active flex flex-col items-center justify-center text-amber-400">
+                <i class="nav-icon fa-solid fa-house text-lg mb-1"></i>
+                <span class="text-[10px] font-semibold" data-bn="হোম" data-en="Home">হোম</span>
+            </a>
+
+            <a href="tel:+8801755839901" onclick="setActiveNav(this)" class="nav-item flex flex-col items-center justify-center text-gray-400 hover:text-amber-400">
+                <i class="nav-icon fa-solid fa-phone text-lg mb-1"></i>
+                <span class="text-[10px] font-medium" data-bn="কল করুন" data-en="Call Now">কল করুন</span>
+            </a>
+
+            <button onclick="openBookingModal()" class="flex flex-col items-center justify-center text-black">
+                <div class="w-11 h-11 rounded-full gold-bg-gradient flex items-center justify-center shadow-lg shadow-amber-500/40 -mt-6 border-2 border-dark-900">
+                    <i class="fa-solid fa-calendar-check text-base"></i>
+                </div>
+                <span class="text-[10px] font-bold text-amber-400 mt-1" data-bn="বুকিং" data-en="Book">বুকিং</span>
+            </button>
+
+            <a href="https://wa.me/8801755839901" target="_blank" onclick="setActiveNav(this)" class="nav-item flex flex-col items-center justify-center text-gray-400 hover:text-emerald-400">
+                <i class="nav-icon fa-brands fa-whatsapp text-xl mb-1"></i>
+                <span class="text-[10px] font-medium" data-bn="হোয়াটসঅ্যাপ" data-en="WhatsApp">হোয়াটসঅ্যাপ</span>
+            </a>
+
+            <a href="#contact" onclick="setActiveNav(this)" class="nav-item flex flex-col items-center justify-center text-gray-400 hover:text-amber-400">
+                <i class="nav-icon fa-solid fa-location-dot text-lg mb-1"></i>
+                <span class="text-[10px] font-medium" data-bn="যোগাযোগ" data-en="Contact">যোগাযোগ</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Redesigned Booking Modal strictly matching UI screenshot layout -->
+    <div id="bookingModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-[#0D121D] text-gray-100 max-w-xl w-full my-auto rounded-2xl border border-gray-800 shadow-2xl relative p-5 sm:p-7 max-h-[95vh] overflow-y-auto">
+            
+            <!-- Close Button -->
+            <button onclick="closeBookingModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white transition text-xl w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-800">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <h3 class="text-xl font-bold text-white mb-1" data-bn="তারিখ ও সময় বুক করুন" data-en="Request Date & Time">তারিখ ও সময় বুক করুন</h3>
-            <p class="text-xs text-gray-400 mb-5" data-bn="আপনার সুবিধাজনক তারিখ ও সময় পছন্দ করে কনফার্ম করুন" data-en="Select your preferred date and time slot to confirm">আপনার সুবিধাজনক তারিখ ও সময় পছন্দ করে কনফার্ম করুন</p>
+            <!-- Title & Subtitle -->
+            <div class="mb-6">
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" data-bn="তারিখ ও সময় বুক করুন" data-en="Select Date & Time">তারিখ ও সময় বুক করুন</h3>
+                <p class="text-xs sm:text-sm text-gray-400 mt-1" data-bn="তারিখ ও স্লট সিলেক্ট করে আপনার সঠিক তথ্য দিন" data-en="Select date & time slot and provide accurate information">তারিখ ও স্লট সিলেক্ট করে আপনার সঠিক তথ্য দিন</p>
+            </div>
 
             <form id="bookingForm" onsubmit="handleBookingSubmit(event)" novalidate class="space-y-4">
-                <!-- Name Field -->
+                
+                <!-- 1. Name Field -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1" data-bn="আপনার নাম *" data-en="Your Name *">আপনার নাম *</label>
-                    <input type="text" id="custName" oninput="validateName()" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition" placeholder="যেমন: রাফসান আহমেদ">
-                    <p id="nameError" class="text-red-400 text-[11px] mt-1 hidden"></p>
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-200 mb-1.5" data-bn="আপনার নাম *" data-en="Your Name *">আপনার নাম *</label>
+                    <input type="text" id="custName" oninput="validateName()" class="w-full bg-[#151D2A] border border-gray-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition" placeholder="যেমন: রাফসান আহমেদ">
+                    <p id="nameError" class="text-red-400 text-[11px] mt-1 hidden" data-bn="দয়া করে আপনার নাম লিখুন (কমপক্ষে ৩ অক্ষর)।" data-en="Please enter your name (at least 3 characters).">দয়া করে আপনার নাম লিখুন (কমপক্ষে ৩ অক্ষর)।</p>
                 </div>
 
-                <!-- Phone Number Field -->
+                <!-- 2. Phone Field -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1" data-bn="মোবাইল নম্বর (১১ ডিজিট) *" data-en="Mobile Number (11 digits) *">মোবাইল নম্বর (১১ ডিজিট) *</label>
-                    <input type="tel" id="custPhone" maxlength="11" oninput="validatePhone()" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition" placeholder="017XXXXXXXX">
-                    <p id="phoneError" class="text-red-400 text-[11px] mt-1 hidden"></p>
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-200 mb-1.5" data-bn="মোবাইল নম্বর (১১ ডিজিট) *" data-en="Mobile Number (11 digits) *">মোবাইল নম্বর (১১ ডিজিট) *</label>
+                    <input type="tel" id="custPhone" maxlength="11" oninput="validatePhone()" class="w-full bg-[#151D2A] border border-gray-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition" placeholder="017XXXXXXXX">
+                    <p id="phoneError" class="text-red-400 text-[11px] mt-1 hidden" data-bn="সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01712345678)।" data-en="Enter a valid 11-digit mobile number.">সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01712345678)।</p>
                 </div>
 
-                <!-- Service Selection Field -->
+                <!-- 3. Service Dropdown Field -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1" data-bn="সার্ভিস সিলেক্ট করুন *" data-en="Select Service *">সার্ভিস সিলেক্ট করুন *</label>
-                    <select id="modalServiceSelect" onchange="validateService()" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition">
-                        <option value="" disabled selected data-bn="-- একটি সার্ভিস পছন্দ করুন --" data-en="-- Choose a service --">-- একটি সার্ভিস পছন্দ করুন --</option>
-                        <option value="Premium Haircut">প্রিমিয়াম হেয়ারকাট</option>
-                        <option value="Beard Design">বিয়ার্ড ডিজাইন ও ট্রিম</option>
-                        <option value="Keratin Treatment">কেরাটিন ও রিবন্ডিং</option>
-                        <option value="Hair Color">হেয়ার কালার ও হাইলাইটস</option>
-                        <option value="Gents Facial">জেন্টলম্যান ফেসিয়াল</option>
-                        <option value="Dandruff Spa">হেড ও ড্যান্ড্রাফ স্পা</option>
-                    </select>
-                    <p id="serviceError" class="text-red-400 text-[11px] mt-1 hidden"></p>
-                </div>
-
-                <!-- Calendar Date Selection Field -->
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-medium text-gray-300" data-bn="তারিখ নির্বাচন করুন *" data-en="Select Date *">তারিখ নির্বাচন করুন *</label>
-                        <span id="selectedDateDisplay" class="text-[11px] text-amber-400 font-semibold">১৬ অক্টোবর ২০২৬</span>
-                    </div>
-
-                    <div class="border border-gray-700 rounded-2xl p-4 bg-gray-900/60" id="calendarBox">
-                        <div class="flex items-center justify-between mb-3 text-sm font-semibold text-white">
-                            <button type="button" class="text-gray-500 cursor-not-allowed text-xs"><i class="fa-solid fa-chevron-left"></i></button>
-                            <span id="calendarMonthHeader" data-bn="অক্টোবর ২০২৬" data-en="October 2026">অক্টোবর ২০২৬</span>
-                            <button type="button" class="text-gray-400 hover:text-amber-400 text-xs"><i class="fa-solid fa-chevron-right"></i></button>
-                        </div>
-
-                        <!-- Days of Week -->
-                        <div class="grid grid-cols-7 text-center text-[10px] text-gray-400 font-medium mb-2">
-                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                        </div>
-
-                        <!-- Days Grid -->
-                        <div class="grid grid-cols-7 text-center text-xs gap-1 font-medium">
-                            <div class="py-1 text-gray-600">11</div>
-                            <div class="py-1 text-gray-600">12</div>
-                            <div class="py-1 text-gray-600">13</div>
-                            <div class="py-1 text-gray-600">14</div>
-                            <div class="py-1 text-gray-600">15</div>
-                            <div class="py-1 rounded-lg bg-amber-500 text-black font-bold shadow-md shadow-amber-500/30 cursor-pointer calendar-day-btn selected" onclick="selectDate(this, '16')">16</div>
-                            <div class="py-1 text-gray-300 hover:bg-gray-800 rounded-lg cursor-pointer calendar-day-btn" onclick="selectDate(this, '17')">17</div>
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-200 mb-1.5" data-bn="সার্ভিস সিলেক্ট করুন *" data-en="Select Service *">সার্ভিস সিলেক্ট করুন *</label>
+                    <div class="relative">
+                        <select id="modalServiceSelect" onchange="validateService()" class="w-full bg-[#151D2A] border border-gray-700/80 rounded-xl px-4 py-3 text-sm text-white appearance-none focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition pr-10 cursor-pointer">
+                            <option value="" disabled selected data-bn="-- একটি সার্ভিস পছন্দ করুন --" data-en="-- Choose a service --">-- একটি সার্ভিস পছন্দ করুন --</option>
+                            <option value="Premium Haircut">প্রিমিয়াম হেয়ারকাট (BDT 250-500)</option>
+                            <option value="Beard Design">বিয়ার্ড ডিজাইন ও ট্রিম (BDT 150-300)</option>
+                            <option value="Keratin Treatment">কেরাটিন ও রিবন্ডিং (BDT 1500-3500)</option>
+                            <option value="Hair Color">হেয়ার কালার ও হাইলাইটস (BDT 500-1800)</option>
+                            <option value="Gents Facial">ফেসিয়াল ও স্কিন কেয়ার (BDT 600-1500)</option>
+                            <option value="Dandruff Spa">হেড ও ড্যান্ড্রাফ স্পা (BDT 500-1000)</option>
+                            <option value="Shave Cleanup">শেভ ও ফেস ক্লিনআপ (BDT 200-400)</option>
+                            <option value="Mani Pedi">ম্যানিকিউর ও পেডিকিউর (BDT 400-800)</option>
+                            <option value="Skin Treatment">স্কিন কেয়ার ও ট্রিটমেন্ট (BDT 800-2000)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
                         </div>
                     </div>
-                    <p id="dateError" class="text-red-400 text-[11px] mt-1 hidden"></p>
+                    <p id="serviceError" class="text-red-400 text-[11px] mt-1 hidden" data-bn="দয়া করে একটি সার্ভিস সিলেক্ট করুন।" data-en="Please select a service.">দয়া করে একটি সার্ভিস সিলেক্ট করুন।</p>
                 </div>
 
-                <!-- Interactive Time Slots Grid -->
+                <!-- 4. Date Picker Field -->
                 <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-xs font-medium text-gray-300" data-bn="সময় নির্বাচন করুন *" data-en="Select Time Slot *">সময় নির্বাচন করুন *</label>
-                        <span class="text-[10px] text-gray-500">Asia/Dhaka (UTC+06)</span>
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-200 mb-1.5" data-bn="বুকিংয়ের তারিখ *" data-en="Booking Date *">বুকিংয়ের তারিখ *</label>
+                    <div class="relative">
+                        <input type="date" id="bookingDate" onchange="validateDate()" class="w-full bg-[#151D2A] border border-gray-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition font-medium">
                     </div>
-
-                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 text-xs" id="timeSlotGrid">
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">6:30 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">6:45 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">7:00 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">7:15 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">7:30 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">7:45 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">8:00 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn time-slot selected py-2 px-1 rounded-xl text-center">8:15 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">8:30 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">8:45 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">9:00 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">9:15 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">9:30 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">9:45 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">10:00 PM</button>
-                        <button type="button" onclick="selectSlot(this)" class="time-slot-btn py-2 px-1 rounded-xl text-center">10:15 PM</button>
-                    </div>
-                    <p id="slotError" class="text-red-400 text-[11px] mt-1 hidden"></p>
+                    <p id="dateError" class="text-red-400 text-[11px] mt-1 hidden" data-bn="দয়া করে একটি তারিখ নির্বাচন করুন।" data-en="Please select a date.">দয়া করে একটি তারিখ নির্বাচন করুন।</p>
                 </div>
 
-                <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-black gold-bg-gradient hover:opacity-90 transition text-sm shadow-lg shadow-amber-500/25 mt-3">
+                <!-- 5. Time Slots Selection (Interactive Buttons Grid strictly matching screenshot design) -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-200 mb-2" data-bn="সময় স্লট পছন্দ করুন (এভেইলেবল স্লট) *" data-en="Select Time Slot (Available Slots) *">সময় স্লট পছন্দ করুন (এভেইলেবল স্লট) *</label>
+                    
+                    <div class="grid grid-cols-3 gap-2.5 sm:gap-3" id="timeSlotsGrid">
+                        <!-- 10:00 AM -->
+                        <div onclick="selectTimeSlot(this, '10:00 AM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">10:00 AM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 11:00 AM -->
+                        <div onclick="selectTimeSlot(this, '11:00 AM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">11:00 AM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 12:00 PM -->
+                        <div onclick="selectTimeSlot(this, '12:00 PM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">12:00 PM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 02:00 PM -->
+                        <div onclick="selectTimeSlot(this, '02:00 PM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">02:00 PM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 03:00 PM -->
+                        <div onclick="selectTimeSlot(this, '03:00 PM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">03:00 PM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 04:00 PM -->
+                        <div onclick="selectTimeSlot(this, '04:00 PM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">04:00 PM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 05:00 PM -->
+                        <div onclick="selectTimeSlot(this, '05:00 PM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">05:00 PM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 06:00 PM -->
+                        <div onclick="selectTimeSlot(this, '06:00 PM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">06:00 PM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+
+                        <!-- 07:00 PM -->
+                        <div onclick="selectTimeSlot(this, '07:00 PM')" class="slot-card p-3 rounded-xl border border-gray-800 text-center select-none transition">
+                            <div class="slot-time text-sm sm:text-base font-bold text-gray-200">07:00 PM</div>
+                            <div class="slot-status text-[11px] text-emerald-500 mt-0.5" data-bn="খালি আছে" data-en="Available">খালি আছে</div>
+                        </div>
+                    </div>
+                    <p id="slotError" class="text-red-400 text-[11px] mt-1.5 hidden" data-bn="দয়া করে একটি সময় স্লট পছন্দ করুন।" data-en="Please select a time slot.">দয়া করে একটি সময় স্লট পছন্দ করুন।</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-3.5 sm:py-4 rounded-xl font-bold text-black gold-bg-gradient hover:opacity-95 shadow-lg shadow-amber-500/20 transition text-sm sm:text-base mt-4 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i>
                     <span data-bn="বুকিং কনফার্ম করুন" data-en="Confirm Booking">বুকিং কনফার্ম করুন</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Image Lightbox Modal -->
-    <div id="lightboxModal" class="fixed inset-0 z-50 bg-black/90 hidden items-center justify-center p-4" onclick="closeLightbox()">
-        <div class="relative max-w-3xl w-full text-center" onclick="event.stopPropagation()">
-            <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white text-2xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <img id="lightboxImage" src="" alt="Zoomed" class="max-h-[80vh] mx-auto rounded-xl border border-gray-700">
-            <h4 id="lightboxCaption" class="text-white font-bold text-lg mt-4"></h4>
-        </div>
-    </div>
-
-    <!-- Mobile Sticky Quick Bar (Visible only on mobile devices < sm) -->
-    <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-900/95 border-t border-gray-800 p-2.5 backdrop-blur-md flex items-center justify-around">
-        <a href="tel:+8801755839901" class="flex flex-col items-center text-amber-400 text-xs font-medium">
-            <i class="fa-solid fa-phone text-base mb-0.5"></i>
-            <span data-bn="কল করুন" data-en="Call">কল করুন</span>
-        </a>
-        <button onclick="openBookingModal()" class="px-5 py-2 rounded-xl text-black font-bold text-xs gold-bg-gradient shadow-lg shadow-amber-500/20">
-            <span data-bn="বুকিং করুন" data-en="Book Now">বুকিং করুন</span>
-        </button>
-        <a href="https://wa.me/8801755839901" target="_blank" class="flex flex-col items-center text-emerald-400 text-xs font-medium">
-            <i class="fa-brands fa-whatsapp text-lg mb-0.5"></i>
-            <span data-bn="হোয়াটসঅ্যাপ" data-en="WhatsApp">হোয়াটসঅ্যাপ</span>
-        </a>
-    </div>
-
-    <!-- JS Scripts -->
+    <!-- JavaScript logic -->
     <script>
-        // Mobile Hamburger Menu Toggle Functionality
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const icon = document.getElementById('hamburgerIcon');
-            
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-xmark');
-            } else {
-                menu.classList.add('hidden');
-                icon.classList.remove('fa-xmark');
-                icon.classList.add('fa-bars');
+        // Set default date picker value to 2026-10-17 as shown in sample
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('bookingDate');
+            if (dateInput) {
+                const today = new Date('2026-10-17');
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
             }
+        });
+
+        // Hero Background Slider
+        let currentHeroIndex = 0;
+        const heroSlides = document.querySelectorAll('.hero-slide');
+        const heroDots = document.querySelectorAll('.hero-dot');
+        let heroSlideInterval;
+
+        function showHeroSlide(index) {
+            heroSlides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            heroDots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.remove('bg-gray-600');
+                    dot.classList.add('bg-amber-500');
+                } else {
+                    dot.classList.remove('bg-amber-500');
+                    dot.classList.add('bg-gray-600');
+                }
+            });
+
+            currentHeroIndex = index;
         }
 
-        function closeMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const icon = document.getElementById('hamburgerIcon');
-            if (menu) {
-                menu.classList.add('hidden');
-                icon.classList.remove('fa-xmark');
-                icon.classList.add('fa-bars');
-            }
+        function nextHeroSlide() {
+            let nextIndex = (currentHeroIndex + 1) % heroSlides.length;
+            showHeroSlide(nextIndex);
+            resetHeroTimer();
+        }
+
+        function prevHeroSlide() {
+            let prevIndex = (currentHeroIndex - 1 + heroSlides.length) % heroSlides.length;
+            showHeroSlide(prevIndex);
+            resetHeroTimer();
+        }
+
+        function goToHeroSlide(index) {
+            showHeroSlide(index);
+            resetHeroTimer();
+        }
+
+        function startHeroTimer() {
+            heroSlideInterval = setInterval(nextHeroSlide, 5000);
+        }
+
+        function resetHeroTimer() {
+            clearInterval(heroSlideInterval);
+            startHeroTimer();
+        }
+
+        startHeroTimer();
+
+        // Calculator Total Estimation Function
+        function calculateTotal() {
+            const checkboxes = document.querySelectorAll('.calc-item:checked');
+            let total = 0;
+            checkboxes.forEach(cb => {
+                total += parseInt(cb.value);
+            });
+            document.getElementById('totalPrice').innerText = `৳ ${total.toLocaleString('bn-BD')}`;
         }
 
         // Language Toggle Logic
         let currentLang = 'BN';
-        let selectedDayVal = '16';
-        let selectedTimeVal = '8:15 PM';
         
         function toggleLanguage() {
             currentLang = currentLang === 'BN' ? 'EN' : 'BN';
@@ -846,89 +775,46 @@
                     el.innerText = targetText;
                 }
             });
-            updateDateDisplay();
-            validateName();
-            validatePhone();
-            validateService();
         }
 
-        // Before After Slider Logic
-        const container = document.getElementById('baContainer');
-        const afterImg = document.getElementById('baAfter');
-        const slider = document.getElementById('baSlider');
-        let isDragging = false;
-
-        function setSliderPosition(x) {
-            const rect = container.getBoundingClientRect();
-            let position = ((x - rect.left) / rect.width) * 100;
-            if (position < 0) position = 0;
-            if (position > 100) position = 100;
-
-            afterImg.style.width = `${position}%`;
-            slider.style.left = `${position}%`;
+        // Bottom Navigation Active Switch
+        function setActiveNav(element) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active', 'text-amber-400');
+                item.classList.add('text-gray-400');
+            });
+            element.classList.add('active', 'text-amber-400');
+            element.classList.remove('text-gray-400');
         }
 
-        container.addEventListener('mousedown', () => isDragging = true);
-        window.addEventListener('mouseup', () => isDragging = false);
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            setSliderPosition(e.clientX);
-        });
+        // Time Slot Selection Handler
+        let selectedTimeSlotValue = '';
 
-        container.addEventListener('touchstart', () => isDragging = true);
-        window.addEventListener('touchend', () => isDragging = false);
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            setSliderPosition(e.touches[0].clientX);
-        });
+        function selectTimeSlot(element, slotTime) {
+            // Unselect all
+            document.querySelectorAll('.slot-card').forEach(card => {
+                card.classList.remove('selected');
+            });
 
-        // Date selection
-        function selectDate(element, dayStr) {
-            document.querySelectorAll('.calendar-day-btn').forEach(b => b.classList.remove('selected'));
+            // Select clicked slot
             element.classList.add('selected');
-            selectedDayVal = dayStr;
-            updateDateDisplay();
-            document.getElementById('dateError').classList.add('hidden');
-        }
-
-        function updateDateDisplay() {
-            const display = document.getElementById('selectedDateDisplay');
-            if (currentLang === 'BN') {
-                display.innerText = `${selectedDayVal} অক্টোবর ২০২৬`;
-            } else {
-                display.innerText = `${selectedDayVal} October 2026`;
-            }
-        }
-
-        // Time Slot Selection
-        function selectSlot(btn) {
-            document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            selectedTimeVal = btn.innerText.trim();
+            selectedTimeSlotValue = slotTime;
+            
+            // Hide slot validation error if present
             document.getElementById('slotError').classList.add('hidden');
         }
 
-        // Real-time Validations
+        // Form Validation Functions
         function validateName() {
             const input = document.getElementById('custName');
             const error = document.getElementById('nameError');
-            if (!input) return true;
-            const val = input.value.trim();
-
-            if (!val) {
-                error.innerText = currentLang === 'BN' ? 'অনুগ্রহ করে আপনার পুরো নাম লিখুন।' : 'Please enter your full name.';
-                error.classList.remove('hidden');
-                input.classList.add('border-red-500');
-                return false;
-            } else if (val.length < 3) {
-                error.innerText = currentLang === 'BN' ? 'নাম অন্তত ৩ অক্ষরের হতে হবে।' : 'Name must be at least 3 characters.';
+            if (input.value.trim().length < 3) {
                 error.classList.remove('hidden');
                 input.classList.add('border-red-500');
                 return false;
             } else {
                 error.classList.add('hidden');
                 input.classList.remove('border-red-500');
-                input.classList.add('border-emerald-500');
                 return true;
             }
         }
@@ -936,24 +822,14 @@
         function validatePhone() {
             const input = document.getElementById('custPhone');
             const error = document.getElementById('phoneError');
-            if (!input) return true;
-            const val = input.value.trim();
-            const bdPhoneRegex = /^01[3-9]\d{8}$/;
-
-            if (!val) {
-                error.innerText = currentLang === 'BN' ? 'অনুগ্রহ করে ১১ ডিজিটের মোবাইল নম্বর দিন।' : 'Please enter 11-digit phone number.';
-                error.classList.remove('hidden');
-                input.classList.add('border-red-500');
-                return false;
-            } else if (!bdPhoneRegex.test(val)) {
-                error.innerText = currentLang === 'BN' ? 'সঠিক ১১ ডিজিটের বিডি ফোন নম্বর লিখুন (যেমন: 01712345678)।' : 'Enter a valid 11-digit BD number (e.g. 01712345678).';
+            const phoneRegex = /^01[3-9]\d{8}$/;
+            if (!phoneRegex.test(input.value.trim())) {
                 error.classList.remove('hidden');
                 input.classList.add('border-red-500');
                 return false;
             } else {
                 error.classList.add('hidden');
                 input.classList.remove('border-red-500');
-                input.classList.add('border-emerald-500');
                 return true;
             }
         }
@@ -961,59 +837,63 @@
         function validateService() {
             const select = document.getElementById('modalServiceSelect');
             const error = document.getElementById('serviceError');
-            if (!select) return true;
-
             if (!select.value) {
-                error.innerText = currentLang === 'BN' ? 'অনুগ্রহ করে একটি সার্ভিস সিলেক্ট করুন।' : 'Please select a service.';
                 error.classList.remove('hidden');
                 select.classList.add('border-red-500');
                 return false;
             } else {
                 error.classList.add('hidden');
                 select.classList.remove('border-red-500');
-                select.classList.add('border-emerald-500');
+                return true;
+            }
+        }
+
+        function validateDate() {
+            const input = document.getElementById('bookingDate');
+            const error = document.getElementById('dateError');
+            if (!input.value) {
+                error.classList.remove('hidden');
+                input.classList.add('border-red-500');
+                return false;
+            } else {
+                error.classList.add('hidden');
+                input.classList.remove('border-red-500');
                 return true;
             }
         }
 
         function validateSlot() {
-            const selectedSlot = document.querySelector('.time-slot-btn.selected');
             const error = document.getElementById('slotError');
-            if (!selectedSlot) {
-                error.innerText = currentLang === 'BN' ? 'অনুগ্রহ করে একটি সময় নির্ধারণ করুন।' : 'Please select a time slot.';
+            if (!selectedTimeSlotValue) {
                 error.classList.remove('hidden');
                 return false;
+            } else {
+                error.classList.add('hidden');
+                return true;
             }
-            error.classList.add('hidden');
-            return true;
         }
 
-        // Price Calculator
-        function calculateTotal() {
-            const checkboxes = document.querySelectorAll('.calc-item:checked');
-            let total = 0;
-            checkboxes.forEach(cb => {
-                total += parseInt(cb.value);
-            });
-            document.getElementById('totalPrice').innerText = `৳ ${total.toLocaleString('bn-BD')}`;
-        }
-
-        // Booking Modal Triggers
+        // Modal Controls & Budget Integration
         function openBookingModal(serviceName = '') {
             const modal = document.getElementById('bookingModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
+            // Reset state
             document.getElementById('bookingForm').reset();
-            document.querySelectorAll('#bookingForm input, #bookingForm select').forEach(el => {
-                el.classList.remove('border-red-500', 'border-emerald-500');
-            });
+            selectedTimeSlotValue = '';
+            document.querySelectorAll('.slot-card').forEach(c => c.classList.remove('selected'));
             document.querySelectorAll('#bookingForm p').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('#bookingForm input, #bookingForm select').forEach(el => el.classList.remove('border-red-500'));
+            
+            // Re-apply default date
+            const dateInput = document.getElementById('bookingDate');
+            if (dateInput) {
+                dateInput.value = '2026-10-17';
+            }
 
             if (serviceName) {
-                const select = document.getElementById('modalServiceSelect');
-                select.value = serviceName;
-                validateService();
+                document.getElementById('modalServiceSelect').value = serviceName;
             }
         }
 
@@ -1038,44 +918,22 @@
             const isNameValid = validateName();
             const isPhoneValid = validatePhone();
             const isServiceValid = validateService();
+            const isDateValid = validateDate();
             const isSlotValid = validateSlot();
 
-            if (isNameValid && isPhoneValid && isServiceValid && isSlotValid) {
-                const name = document.getElementById('custName').value.trim();
+            if (isNameValid && isPhoneValid && isServiceValid && isDateValid && isSlotValid) {
+                const name = document.getElementById('custName').value;
+                const phone = document.getElementById('custPhone').value;
                 const service = document.getElementById('modalServiceSelect').value;
-                const dateStr = selectedDayVal;
-                const timeStr = selectedTimeVal;
+                const date = document.getElementById('bookingDate').value;
 
                 const msg = currentLang === 'BN' 
-                    ? `ধন্যবাদ ${name}! আপনার বুকিং রিকোয়েস্ট সফল হয়েছে।
-সার্ভিস: ${service}
-তারিখ: ${dateStr} অক্টোবর, ২০২৬
-সময়: ${timeStr}
-আমরা দ্রুত আপনার সাথে যোগাযোগ করব।`
-                    : `Thank you ${name}! Your appointment booking request was successful.
-Service: ${service}
-Date: ${dateStr} October, 2026
-Time: ${timeStr}
-We will contact you shortly.`;
+                    ? `ধন্যবাদ ${name}! আপনার বুকিং রিকোয়েস্ট প্রাপ্ত হয়েছে:\n\n• সার্ভিস: ${service}\n• তারিখ: ${date}\n• সময়: ${selectedTimeSlotValue}\n• মোবাইল: ${phone}\n\nআমরা শীঘ্রই কল করে কনফার্ম করব।`
+                    : `Thank you ${name}! Your booking request was received:\n\n• Service: ${service}\n• Date: ${date}\n• Time: ${selectedTimeSlotValue}\n• Mobile: ${phone}\n\nWe will contact you shortly to confirm.`;
                 
                 alert(msg);
                 closeBookingModal();
             }
-        }
-
-        // Lightbox Modal
-        function openLightbox(imgSrc, caption) {
-            document.getElementById('lightboxImage').src = imgSrc;
-            document.getElementById('lightboxCaption').innerText = caption;
-            const lightbox = document.getElementById('lightboxModal');
-            lightbox.classList.remove('hidden');
-            lightbox.classList.add('flex');
-        }
-
-        function closeLightbox() {
-            const lightbox = document.getElementById('lightboxModal');
-            lightbox.classList.add('hidden');
-            lightbox.classList.remove('flex');
         }
     </script>
 </body>
